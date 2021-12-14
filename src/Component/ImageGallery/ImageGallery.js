@@ -1,9 +1,10 @@
-import React, { Component } from 'react'
+import React from 'react'
 // import PropTypes from 'prop-types'
 import s from './ImageGallery.module.css'
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem'
 
 export function ImageGallery({ onModalOpen, result }) {
+  // console.log(result)
   return (
     <ul className={s.ImageGallery}>
       {result.map(({ id, webformatURL, largeImageURL, tags }) => (

@@ -6,27 +6,28 @@ import s from './Searchbar.module.css'
 
 export class Searchbar extends Component {
   state = {
-    sairchinput: '',
+    searchinput: '',
   }
-
+  /* ---------------------------- значение в инпуте --------------------------- */
   handelNameImg = (e) => {
-    this.setState({ sairchinput: e.currentTarget.value.toLowerCase() })
+    const { value } = e.currentTarget
+    this.setState({ searchinput: value.toLowerCase() })
   }
-
+  /* ----------------------------- запрос в сабмит и запись в state---------------------------- */
   handelSubmit = (e) => {
     e.preventDefault()
-    const { sairchinput } = this.state
+    const { searchinput } = this.state
 
-    if (sairchinput.trim() === '') {
+    if (searchinput.trim() === '') {
       return toast.error('Введите запрос')
     }
 
-    this.props.onSubmit(sairchinput)
-    this.setState({ sairchinput: '' })
+    this.props.onSubmit(searchinput)
+    this.setState({ searchinput: '' })
   }
 
   render() {
-    const { sairchinput } = this.state
+    const { searchinput } = this.state
     return (
       <header className={s.Searchbar}>
         <form className={s.SearchForm} onSubmit={this.handelSubmit}>
@@ -41,7 +42,7 @@ export class Searchbar extends Component {
             autoComplete="off"
             autoFocus
             placeholder="Search images and photos"
-            value={sairchinput}
+            value={searchinput}
             onChange={this.handelNameImg}
           />
         </form>

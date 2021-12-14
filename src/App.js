@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { ToastContainer } from 'react-toastify'
 import { Searchbar } from './Component/Searchbar/Searchbar'
-import { Spinner } from './Component/Spinner/Spinner'
+import Spinner from './Component/Spinner/Spinner'
 import { ImageGallery } from './Component/ImageGallery/ImageGallery'
 import fetchAPI from '../src/Servise/imagesApi'
 import { Button } from './Component/Button/Button'
@@ -9,25 +9,37 @@ import { Modal } from './Component/Modal/Modal'
 
 export class App extends Component {
   state = {
-    sairchinput: '',
+    searchinput: '',
     error: null,
     status: 'idle',
     page: 1,
     result: [],
   }
 
+  /* -------------------- Сравнение запроса при  обновлении ------------------- */
   componentDidUpdate(prevProps, prevState) {
-    const prevName = prevProps.sairchinput
-    const nextName = this.props.sairchinput
-
+    /* ---------------------------- Предыдущий запрос --------------------------- */
+    const prevName = prevState.searchinput
+    /* ---------------------------- Текущий запрос --------------------------- */
+    const nextName = this.state.searchinput
+    /* --------------------------- Сравнение запросов --------------------------- */
     if (prevName !== nextName) {
       this.setState({ status: 'panding', page: 1 })
       this.imgFatchApi()
+      return
+      // console.log('zamena')
+      // console.log('prevName:', prevName)
+      // console.log('nextName:', nextName)
     }
   }
+
+  /* -------------------------- функция фетч запроса -------------------------- */
   imgFatchApi = () => {
-    const { sairchinput, page } = this.state
-    fetchAPI(sairchinput, page)
+    const { searchinput, page } = this.state
+    // console.log(searchinput)
+    // console.log(page)
+
+    fetchAPI(searchinput, page)
       .then((images) => {
         if (images.total === 0) {
           this.setState({
@@ -35,21 +47,22 @@ export class App extends Component {
             status: 'resolved',
           })
         } else {
-          this.setState((prevState) => ({
-            result: [...prevState.result, ...images.hits],
+          this.setState((prevProps) => ({
+            result: [...prevProps.result, ...images.hits],
             status: 'resolved',
-            page: prevState.page + 1,
-            sairchinput: sairchinput,
+            page: prevProps.page + 1,
+            searchinput: searchinput,
           }))
-          window.scrollTo({
-            top: document.documentElrmrnt.sairchinput,
-            behavior: 'smooth',
-          })
+          // window.scrollTo({
+          //   top: document.documentElrmrnt.searchinput,
+          //   behavior: 'smooth',
+          // })
         }
       })
       .catch((error) => this.setState({ error, status: 'rejected' }))
   }
 
+  /* ------------------------ Функция открытия модалки ------------------------ */
   handelOpenModal = (url, alt) => {
     this.setState({
       largImageURL: url,
@@ -57,6 +70,7 @@ export class App extends Component {
     })
   }
 
+  /* ------------------------ функция закрытия модалки ------------------------ */
   handelCloseModal = () => {
     this.setState({
       largImageURL: '',
@@ -64,10 +78,14 @@ export class App extends Component {
     })
   }
 
+  /* ------------------------- функция поиска в форме ------------------------- */
   handelSearchSubmitForm = (imagesName) => {
-    this.setState({ sairchinput: imagesName, page: 1, result: [], error: null })
+    // console.log(imagesName)
+    this.setState({ searchinput: imagesName, page: 1, result: [], error: null })
+    this.imgFatchApi()
   }
 
+  /* ---------------------- Функция кнопки загрузить ещё ---------------------- */
   handelLoadMore = () => {
     this.setState({
       status: 'panding',
