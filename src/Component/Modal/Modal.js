@@ -2,11 +2,13 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import s from './Modal.module.css'
 
-export class Modal extends Component {
+class Modal extends Component {
   static propTypes = {
-    prop: PropTypes,
+    onClick: PropTypes.func.isRequired,
+    largImageURL: PropTypes.string.isRequired,
   }
 
+  /* ------------------------- методы жизненного цикла в которые записаны слушатели событий ------------------------ */
   componentDidMount() {
     window.addEventListener('keydown', this.closeModal)
   }
@@ -15,19 +17,22 @@ export class Modal extends Component {
     window.addEventListener('keydown', this.closeModal)
   }
 
+  /* ------------- функция закрытия модалки по нажатию на Escape переданная через пропс ------------ */
   closeModal = (e) => {
     if (e.code === 'Escape') {
       this.props.onClick()
     }
   }
   render() {
-    const { onClick, largImageURL, alt } = this.props
+    const { onClick, largImageURL } = this.props
     return (
       <div className={s.Overlay} onClick={onClick}>
         <div className={s.Modal}>
-          <img src={largImageURL} alt={alt} />
+          <img src={largImageURL} alt="" />
         </div>
       </div>
     )
   }
 }
+
+export default Modal

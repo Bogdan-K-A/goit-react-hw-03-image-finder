@@ -1,28 +1,36 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { ImSearch } from 'react-icons/im'
 import s from './Searchbar.module.css'
 
-export class Searchbar extends Component {
+class Searchbar extends Component {
+  static propTypes = {
+    onSubmit: PropTypes.func.isRequired,
+  }
+
   state = {
     searchinput: '',
   }
-  /* ---------------------------- значение в инпуте --------------------------- */
+
+  /* ---------------------------- Отслеживает запрос в инпуте --------------------------- */
   handelNameImg = (e) => {
     const { value } = e.currentTarget
     this.setState({ searchinput: value.toLowerCase() })
   }
+
   /* ----------------------------- запрос в сабмит и запись в state---------------------------- */
   handelSubmit = (e) => {
     e.preventDefault()
     const { searchinput } = this.state
 
+    /* ---------------- если инпут пустой выпадет предупреждение ---------------- */
     if (searchinput.trim() === '') {
       return toast.error('Введите запрос')
     }
-
     this.props.onSubmit(searchinput)
+    /* ------------------- очистка инпута посне нажатия кнопки ------------------ */
     this.setState({ searchinput: '' })
   }
 
@@ -50,3 +58,5 @@ export class Searchbar extends Component {
     )
   }
 }
+
+export default Searchbar

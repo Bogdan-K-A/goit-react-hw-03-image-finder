@@ -1,5 +1,5 @@
 function imagesApi(imagesName, numPage) {
-  console.log(imagesName)
+  // console.log(imagesName)
   // console.log(numPage)
   const API_KEY = '23996907-65b7baf3ba7389d44636c5d9e'
   const BASE_URL = `https://pixabay.com/api/`
@@ -11,7 +11,8 @@ function imagesApi(imagesName, numPage) {
     if (response.ok) {
       return response.json()
     }
-    return Promise.reject(new Error(`Такого названия ${imagesName} нет`))
+    return Promise.reject(new Error())
+    // return Promise.reject(new Error(`Такого названия ${imagesName} нет`))
   })
 }
 

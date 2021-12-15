@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import { ToastContainer } from 'react-toastify'
-import { Searchbar } from './Component/Searchbar/Searchbar'
+import Searchbar from './Component/Searchbar/Searchbar'
 import Spinner from './Component/Spinner/Spinner'
-import { ImageGallery } from './Component/ImageGallery/ImageGallery'
+import ImageGallery from './Component/ImageGallery/ImageGallery'
 import fetchAPI from '../src/Servise/imagesApi'
-import { Button } from './Component/Button/Button'
-import { Modal } from './Component/Modal/Modal'
+import Button from './Component/Button/Button'
+import Modal from './Component/Modal/Modal'
 
 export class App extends Component {
   state = {
@@ -18,15 +18,13 @@ export class App extends Component {
 
   /* -------------------- Сравнение запроса при  обновлении ------------------- */
   componentDidUpdate(prevProps, prevState) {
-    /* ---------------------------- Предыдущий запрос --------------------------- */
-    const prevName = prevState.searchinput
-    /* ---------------------------- Текущий запрос --------------------------- */
-    const nextName = this.state.searchinput
+    const prevName = prevState.searchinput //Предыдущий запрос
+    const nextName = this.state.searchinput //Текущий запрос
     /* --------------------------- Сравнение запросов --------------------------- */
     if (prevName !== nextName) {
       this.setState({ status: 'panding', page: 1 })
       this.imgFatchApi()
-      return
+
       // console.log('zamena')
       // console.log('prevName:', prevName)
       // console.log('nextName:', nextName)
@@ -43,8 +41,8 @@ export class App extends Component {
       .then((images) => {
         if (images.total === 0) {
           this.setState({
-            error: 'Нет картинок по запросу',
-            status: 'resolved',
+            error: `Нет картинок по запросу ${searchinput}`,
+            status: 'rejected',
           })
         } else {
           this.setState((prevProps) => ({
@@ -53,20 +51,25 @@ export class App extends Component {
             page: prevProps.page + 1,
             searchinput: searchinput,
           }))
-          // window.scrollTo({
-          //   top: document.documentElrmrnt.searchinput,
-          //   behavior: 'smooth',
-          // })
+          /* ---------------- проскроливает после нажатия загрузить ещё --------------- */
+          this.handleSroll()
         }
       })
       .catch((error) => this.setState({ error, status: 'rejected' }))
   }
 
+  /* ------------------------ Функция прокрутки ------------------------ */
+  handleSroll = () => {
+    window.scrollTo({
+      top: 2000,
+      behavior: 'smooth',
+    })
+  }
   /* ------------------------ Функция открытия модалки ------------------------ */
-  handelOpenModal = (url, alt) => {
+  // передаём в функцию аргумент url в который будет записан пропс в компоненте модалки
+  handelOpenModal = (url) => {
     this.setState({
       largImageURL: url,
-      alt: alt,
     })
   }
 
@@ -74,15 +77,13 @@ export class App extends Component {
   handelCloseModal = () => {
     this.setState({
       largImageURL: '',
-      alt: '',
     })
   }
 
-  /* ------------------------- функция поиска в форме ------------------------- */
+  /* ------------------------- функция запроса в форме ------------------------- */
   handelSearchSubmitForm = (imagesName) => {
     // console.log(imagesName)
-    this.setState({ searchinput: imagesName, page: 1, result: [], error: null })
-    this.imgFatchApi()
+    this.setState({ searchinput: imagesName })
   }
 
   /* ---------------------- Функция кнопки загрузить ещё ---------------------- */
@@ -94,11 +95,12 @@ export class App extends Component {
   }
 
   render() {
-    const { largImageURL, alt, error, status, result } = this.state
+    const { largImageURL, error, status, result } = this.state
 
     return (
       <div>
         <Searchbar onSubmit={this.handelSearchSubmitForm} />
+
         {status === 'panding' && <Spinner />}
 
         {status === 'resolved' && (
@@ -109,12 +111,9 @@ export class App extends Component {
         )}
 
         {largImageURL && (
-          <Modal
-            largImageURL={largImageURL}
-            alt={alt}
-            onClick={this.handelCloseModal}
-          />
+          <Modal largImageURL={largImageURL} onClick={this.handelCloseModal} />
         )}
+
         {status === 'rejected' && <p>{error}</p>}
 
         <ToastContainer autoClose={3000} position="top-center" />

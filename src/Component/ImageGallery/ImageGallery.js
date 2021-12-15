@@ -1,16 +1,17 @@
 import React from 'react'
-// import PropTypes from 'prop-types'
+import PropTypes from 'prop-types'
 import s from './ImageGallery.module.css'
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem'
 
-export function ImageGallery({ onModalOpen, result }) {
+/* --------------------------- result приходит из handelSearchSubmitForm--------------------------- */
+function ImageGallery({ onModalOpen, result }) {
   // console.log(result)
   return (
     <ul className={s.ImageGallery}>
-      {result.map(({ id, webformatURL, largeImageURL, tags }) => (
+      {/* достаём из массива result нужные элементы и передаём в item  */}
+      {result.map(({ id, webformatURL, largeImageURL }) => (
         <ImageGalleryItem
           key={id}
-          imgAlt={tags}
           imgUrl={largeImageURL}
           imgSrc={webformatURL}
           onModalOpen={onModalOpen}
@@ -19,3 +20,16 @@ export function ImageGallery({ onModalOpen, result }) {
     </ul>
   )
 }
+
+ImageGallery.propTypes = {
+  onModalOpen: PropTypes.func.isRequired,
+  result: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      largeImageURL: PropTypes.string.isRequired,
+      webformatURL: PropTypes.string.isRequired,
+    }).isRequired,
+  ).isRequired,
+}
+
+export default ImageGallery
