@@ -61,7 +61,7 @@ export class App extends Component {
   /* ------------------------ Функция прокрутки ------------------------ */
   handleSroll = () => {
     window.scrollTo({
-      top: 2000,
+      top: document.documentElement.scrollHeight,
       behavior: 'smooth',
     })
   }
