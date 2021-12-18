@@ -6,7 +6,7 @@ import ImageGallery from './Component/ImageGallery/ImageGallery'
 import fetchAPI from '../src/Servise/imagesApi'
 import Button from './Component/Button/Button'
 import Modal from './Component/Modal/Modal'
-import MapeprApi from './Component/helper/mapper'
+import MapperApi from './Component/helper/mapper'
 
 export class App extends Component {
   state = {
@@ -25,8 +25,9 @@ export class App extends Component {
     const prevPage = prevState.page
     const nextPage = this.state.page
 
-    /* --------------------------- Сравнение запросов --------------------------- */
+    /* ---------------------------Условие при сравнении запросов --------------------------- */
     if (prevName !== nextName || prevPage !== nextPage) {
+      /* ------------------------------ Выводим фетч ------------------------------ */
       this.imgFatchApi()
 
       // console.log('zamena')
@@ -38,10 +39,12 @@ export class App extends Component {
   /* -------------------------- функция фетч запроса -------------------------- */
   imgFatchApi = () => {
     const { searchinput, page } = this.state
-    console.log(searchinput)
-    console.log(page)
+    // console.log(searchinput)
+    // console.log(page)
     this.setState({ status: 'panding' })
+    /* ------------------- передаём в функцию два аргумента которые будут передавать значения imagesApi ------------------ */
     fetchAPI(searchinput, page)
+      /* ---------------- В аргумент then вписываем произволное имя в это имя передаётся response.json() --------------- */
       .then((images) => {
         if (images.total === 0) {
           // console.log(images.total)
@@ -50,8 +53,9 @@ export class App extends Component {
             status: 'rejected',
           })
         } else {
-          this.setState((prevProps) => ({
-            result: [...prevProps.result, ...MapeprApi(images.hits)],
+          this.setState(({ result }) => ({
+            /* ------------- Записывает в result список елементов с конкретными свойствами из массива ------------ */
+            result: [...result, ...MapperApi(images.hits)],
             error: '',
           }))
           /* ---------------- проскроливает после нажатия загрузить ещё --------------- */
@@ -89,11 +93,13 @@ export class App extends Component {
   /* ------------------------- функция запроса в форме ------------------------- */
   handelSearchSubmitForm = (imagesName) => {
     // console.log(imagesName)
+    /* -------------- очищает поля стейта перед следующим запросом -------------- */
     this.setState({ searchinput: imagesName, result: [], page: 1 })
   }
 
   /* ---------------------- Функция кнопки загрузить ещё ---------------------- */
   handelLoadMore = () => {
+    /* ----------------- добавляет новую страницу к существующей ---------------- */
     let { page } = this.state
     page += 1
     this.setState({ page })

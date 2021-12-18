@@ -1,3 +1,5 @@
+/* -------------- Аргументы принимают значения которые приходят из компонента App через вызванную функцию fetchAPI------------- */
+
 function imagesApi(imagesName, numPage) {
   // console.log(imagesName)
   // console.log(numPage)
