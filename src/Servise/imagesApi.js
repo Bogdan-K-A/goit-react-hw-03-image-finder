@@ -11,8 +11,7 @@ function imagesApi(imagesName, numPage) {
     if (response.ok) {
       return response.json()
     }
-    return Promise.reject(new Error())
-    // return Promise.reject(new Error(`Такого названия ${imagesName} нет`))
+    return Promise.reject(new Error(`Такого названия ${imagesName} нет`))
   })
 }
 

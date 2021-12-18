@@ -6,11 +6,12 @@ import ImageGallery from './Component/ImageGallery/ImageGallery'
 import fetchAPI from '../src/Servise/imagesApi'
 import Button from './Component/Button/Button'
 import Modal from './Component/Modal/Modal'
+import MapeprApi from './Component/helper/mapper'
 
 export class App extends Component {
   state = {
     searchinput: '',
-    error: null,
+    error: '',
     status: 'idle',
     page: 1,
     result: [],
@@ -20,9 +21,12 @@ export class App extends Component {
   componentDidUpdate(prevProps, prevState) {
     const prevName = prevState.searchinput //Предыдущий запрос
     const nextName = this.state.searchinput //Текущий запрос
+
+    const prevPage = prevState.page
+    const nextPage = this.state.page
+
     /* --------------------------- Сравнение запросов --------------------------- */
-    if (prevName !== nextName) {
-      this.setState({ status: 'panding', page: 1 })
+    if (prevName !== nextName || prevPage !== nextPage) {
       this.imgFatchApi()
 
       // console.log('zamena')
@@ -34,28 +38,30 @@ export class App extends Component {
   /* -------------------------- функция фетч запроса -------------------------- */
   imgFatchApi = () => {
     const { searchinput, page } = this.state
-    // console.log(searchinput)
-    // console.log(page)
-
+    console.log(searchinput)
+    console.log(page)
+    this.setState({ status: 'panding' })
     fetchAPI(searchinput, page)
       .then((images) => {
         if (images.total === 0) {
+          // console.log(images.total)
           this.setState({
             error: `Нет картинок по запросу ${searchinput}`,
             status: 'rejected',
           })
         } else {
           this.setState((prevProps) => ({
-            result: [...prevProps.result, ...images.hits],
-            status: 'resolved',
-            page: prevProps.page + 1,
-            searchinput: searchinput,
+            result: [...prevProps.result, ...MapeprApi(images.hits)],
+            error: '',
           }))
           /* ---------------- проскроливает после нажатия загрузить ещё --------------- */
           this.handleSroll()
         }
       })
       .catch((error) => this.setState({ error, status: 'rejected' }))
+      .finally(() => {
+        this.setState({ status: 'resolved' })
+      })
   }
 
   /* ------------------------ Функция прокрутки ------------------------ */
@@ -83,15 +89,16 @@ export class App extends Component {
   /* ------------------------- функция запроса в форме ------------------------- */
   handelSearchSubmitForm = (imagesName) => {
     // console.log(imagesName)
-    this.setState({ searchinput: imagesName })
+    this.setState({ searchinput: imagesName, result: [], page: 1 })
   }
 
   /* ---------------------- Функция кнопки загрузить ещё ---------------------- */
   handelLoadMore = () => {
-    this.setState({
-      status: 'panding',
-    })
-    this.imgFatchApi()
+    let { page } = this.state
+    page += 1
+    this.setState({ page })
+
+    // this.imgFatchApi()
   }
 
   render() {
@@ -103,7 +110,7 @@ export class App extends Component {
 
         {status === 'panding' && <Spinner />}
 
-        {status === 'resolved' && (
+        {result.length > 0 && (
           <>
             <ImageGallery onModalOpen={this.handelOpenModal} result={result} />
             <Button onLoadMore={this.handelLoadMore} />
@@ -114,7 +121,7 @@ export class App extends Component {
           <Modal largImageURL={largImageURL} onClick={this.handelCloseModal} />
         )}
 
-        {status === 'rejected' && <p>{error}</p>}
+        {error && <p>{error}</p>}
 
         <ToastContainer autoClose={3000} position="top-center" />
       </div>
